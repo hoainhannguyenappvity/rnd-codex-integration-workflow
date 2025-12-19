@@ -7,13 +7,13 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
-// import { N8NAPI } from '../../services/n8n';
-import { MatListModule } from '@angular/material/list';
-import { N8NExecutionStore } from '../../stores/n8n-execution-store';
 import { io } from 'socket.io-client';
+import { N8NAPI } from '../../services/n8n';
+import { N8NExecutionStore } from '../../stores/n8n-execution-store';
 
 @Component({
   selector: 'app-home',
@@ -41,7 +41,7 @@ export class Home {
   showLoading = signal(false);
 
   // n8n
-  // readonly #n8nAPI = inject(N8NAPI);
+  readonly #n8nAPI = inject(N8NAPI);
   readonly n8nExecutionStore = inject(N8NExecutionStore);
 
   // Prompt
@@ -133,24 +133,13 @@ export class Home {
     };
 
     this.showLoading.set(true);
-    const timeoutId = setTimeout(() => {
-      clearTimeout(timeoutId);
-      this.showLoading.set(false);
-    }, 3000);
+    this.#n8nAPI.triggerWebhook(submitData).subscribe(() => {
+      const timeoutId = setTimeout(() => {
+        clearTimeout(timeoutId);
 
-    // this.showLoading.set(true);
-    // this.#n8nAPI.triggerWebhook(submitData).subscribe(() => {
-    //   this.#n8nExecutionStore.add({
-    //     id: new Date().getTime(),
-    //     data: submitData,
-    //   });
-
-    //   const timeoutId = setTimeout(() => {
-    //     clearTimeout(timeoutId);
-
-    //     this.showLoading.set(false);
-    //   }, 3000);
-    // });
+        this.showLoading.set(false);
+      }, 3000);
+    });
   }
 
   ngOnDestroy() {
