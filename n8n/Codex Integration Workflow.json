@@ -1,0 +1,173 @@
+{
+  "name": "Codex Integration Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "codex-integration-workflow",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        16
+      ],
+      "id": "706d0402-8bdc-4e1c-a8ce-5445760064ce",
+      "name": "Webhook",
+      "webhookId": "34ecdc6f-9f42-46a8-85b9-ac20510365da"
+    },
+    {
+      "parameters": {
+        "command": "=codex exec \"{{ $json.body.prompt }}\" --json"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        224,
+        16
+      ],
+      "id": "fb39055a-b5b0-45c8-b792-6061c238522f",
+      "name": "Execute Command"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a6516d53-241d-4ea0-a018-1a4a8f0c4ce9",
+              "name": "stdout",
+              "value": "={{ $json.stdout.split(\"\\n\").filter(Boolean).map(JSON.parse).find(item => item.item?.type === \"agent_message\").item.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        16
+      ],
+      "id": "6cb87d58-3916-4b9b-b391-fe0f9e59058b",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "sendTo": "hoainhaannguyen@gmail.com",
+        "subject": "Codex Integration Workflow",
+        "message": "={{ $json.stdout }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        -80
+      ],
+      "id": "68f166fb-f66c-404d-9dbe-91fe20164e59",
+      "name": "Send a message",
+      "webhookId": "f7d495dd-de7d-4202-b749-216292bf4092",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "tlS2tP7X2B1KvXCg",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "channelMessage",
+        "teamId": {
+          "__rl": true,
+          "value": "05432cd9-d2b3-4e44-8212-28405f17eba4",
+          "mode": "list",
+          "cachedResultName": "RnD Discussion"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "19:KhGX9jZOR_wDXqvq-EtbXw4gnvZYSAnr6ZDhQpNiaBw1@thread.tacv2",
+          "mode": "list",
+          "cachedResultName": "General",
+          "cachedResultUrl": "https://teams.cloud.microsoft/l/channel/19%3AKhGX9jZOR_wDXqvq-EtbXw4gnvZYSAnr6ZDhQpNiaBw1%40thread.tacv2/R%26D%20Discussion?groupId=05432cd9-d2b3-4e44-8212-28405f17eba4&tenantId=bfe53760-c13f-4271-9e14-60cf6e1727b8&allowXTenantAccess=True&ngc=True"
+        },
+        "contentType": "html",
+        "message": "={{ $json.stdout }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftTeams",
+      "typeVersion": 2,
+      "position": [
+        672,
+        112
+      ],
+      "id": "c13949d4-2679-4ef9-a9bd-ef418a1eca0b",
+      "name": "Create message",
+      "webhookId": "6925ef6e-2c5e-4081-a3d7-fe9dc41df2ea",
+      "credentials": {
+        "microsoftTeamsOAuth2Api": {
+          "id": "x9gWBs65kuWF62zf",
+          "name": "Microsoft Teams account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Create message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f30b8888-8a93-4f89-b096-b0596a76b449",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d0a98d1883d50ab1fb11f1c2089250d1d7492821be2ab8133be1cc4d824c5a45"
+  },
+  "id": "mC6ecYOIKtoyAtYT",
+  "tags": []
+}

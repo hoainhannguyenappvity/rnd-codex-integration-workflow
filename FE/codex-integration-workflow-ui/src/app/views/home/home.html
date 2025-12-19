@@ -1,0 +1,74 @@
+<mat-tab-group animationDuration="0ms">
+  <mat-tab label="Workflow">
+    <section class="flex flex-col gap-24 p-4">
+      <section class="flex flex-col">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Prompt</mat-label>
+          <textarea matInput rows="4" placeholder="Ex. Review the latest master-branch commit and produce a summary." [(ngModel)]="prompt"></textarea>
+        </mat-form-field>
+
+        <button matButton="tonal" class="w-24! self-end" (click)="sendPrompt()" [disabled]="!prompt || showLoading()">
+          @if (showLoading()) {
+            <mat-spinner [diameter]="24" class="absolute! -top-0.5 left-1"></mat-spinner>
+          }
+          Send
+        </button>
+      </section>
+
+      <section class="flex flex-col gap-4 bg-gray-100 p-4">
+        <h2 class="text-2xl font-medium">Recipients</h2>
+
+        <h4 class="text-xl font-medium">Emails</h4>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Emails</mat-label>
+          <mat-chip-grid #chipGrid aria-label="Enter emails">
+            @for (email of emails(); track email) {
+              <mat-chip-row (removed)="removeEmail(email)" [editable]="true" (edited)="editEmail(email, $event)" [aria-description]="'press enter to edit ' + email">
+                <button matChipEdit [attr.aria-label]="'edit ' + email">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                {{ email }}
+                <button matChipRemove [attr.aria-label]="'remove ' + email">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip-row>
+            }
+            <input placeholder="New email..." [matChipInputFor]="chipGrid" [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true" (matChipInputTokenEnd)="addEmail($event)" />
+          </mat-chip-grid>
+        </mat-form-field>
+
+        <h4 class="text-xl font-medium">MS Teams</h4>
+        <section class="flex flex-row gap-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Select a Team</mat-label>
+            <mat-select [value]="'RnD Discussion'">
+              <mat-option [value]="'RnD Discussion'">RnD Discussion</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Select a Channel</mat-label>
+            <mat-select [value]="'General'">
+              <mat-option [value]="'General'">General</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </section>
+      </section>
+    </section>
+  </mat-tab>
+
+  <mat-tab label="Executions">
+    <section class="block p-4">
+      <mat-list role="list" class="flex! flex-col gap-4">
+        @for (item of n8nExecutionStore.executions(); track item.id) {
+          <mat-list-item role="listitem" [class.border-l-4!]="item.status === 'Success'" [class.border-green-500!]="item.status === 'Success'">
+            <p class="text-xl font-medium">{{ item.short }}</p>
+            <span [class.text-green-500]="item.status === 'Success'">{{ item.status }}</span> in {{ item.date }}
+          </mat-list-item>
+        } @empty {
+          <mat-list-item role="listitem">There are no executions.</mat-list-item>
+        }
+      </mat-list>
+    </section>
+  </mat-tab>
+</mat-tab-group>
