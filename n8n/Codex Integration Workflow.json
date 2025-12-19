@@ -11,7 +11,7 @@
       "typeVersion": 2.1,
       "position": [
         0,
-        16
+        112
       ],
       "id": "706d0402-8bdc-4e1c-a8ce-5445760064ce",
       "name": "Webhook",
@@ -24,34 +24,29 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        224,
-        16
+        448,
+        112
       ],
       "id": "fb39055a-b5b0-45c8-b792-6061c238522f",
-      "name": "Execute Command"
+      "name": "Execute Codex Prompt"
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "a6516d53-241d-4ea0-a018-1a4a8f0c4ce9",
-              "name": "stdout",
-              "value": "={{ $json.stdout.split(\"\\n\").filter(Boolean).map(JSON.parse).find(item => item.item?.type === \"agent_message\").item.text }}",
-              "type": "string"
-            }
-          ]
-        },
+        "method": "POST",
+        "url": "http://localhost:3000/workflow/execution",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Workflow ID').item.json.body }}",
         "options": {}
       },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
       "position": [
-        448,
-        16
+        672,
+        208
       ],
-      "id": "6cb87d58-3916-4b9b-b391-fe0f9e59058b",
-      "name": "Edit Fields"
+      "id": "afaab1e0-123a-4551-86c2-f9725f2369a8",
+      "name": "Socket.IO"
     },
     {
       "parameters": {
@@ -63,11 +58,11 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        672,
+        896,
         -80
       ],
       "id": "68f166fb-f66c-404d-9dbe-91fe20164e59",
-      "name": "Send a message",
+      "name": "Gmail Send Message",
       "webhookId": "f7d495dd-de7d-4202-b749-216292bf4092",
       "credentials": {
         "gmailOAuth2": {
@@ -99,11 +94,11 @@
       "type": "n8n-nodes-base.microsoftTeams",
       "typeVersion": 2,
       "position": [
-        672,
+        896,
         112
       ],
       "id": "c13949d4-2679-4ef9-a9bd-ef418a1eca0b",
-      "name": "Create message",
+      "name": "MS Teams Send Message",
       "webhookId": "6925ef6e-2c5e-4081-a3d7-fe9dc41df2ea",
       "credentials": {
         "microsoftTeamsOAuth2Api": {
@@ -111,6 +106,42 @@
           "name": "Microsoft Teams account"
         }
       }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a6516d53-241d-4ea0-a018-1a4a8f0c4ce9",
+              "name": "stdout",
+              "value": "={{ $json.stdout.split(\"\\n\").filter(Boolean).map(JSON.parse).find(item => item.item?.type === \"agent_message\").item.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        16
+      ],
+      "id": "6cb87d58-3916-4b9b-b391-fe0f9e59058b",
+      "name": "Mapping Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const uuid = require('uuid');\n\n// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.body.id = uuid.v4();\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        112
+      ],
+      "id": "c5b96594-d42c-4e54-9d9d-c8819a76ee0a",
+      "name": "Workflow ID"
     }
   ],
   "pinData": {},
@@ -119,43 +150,64 @@
       "main": [
         [
           {
-            "node": "Execute Command",
+            "node": "Workflow ID",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Execute Command": {
+    "Execute Codex Prompt": {
       "main": [
         [
           {
-            "node": "Edit Fields",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Edit Fields": {
-      "main": [
-        [
-          {
-            "node": "Create message",
+            "node": "Socket.IO",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Send a message",
+            "node": "Mapping Data",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Create message": {
+    "Socket.IO": {
       "main": [
         []
+      ]
+    },
+    "MS Teams Send Message": {
+      "main": [
+        []
+      ]
+    },
+    "Mapping Data": {
+      "main": [
+        [
+          {
+            "node": "MS Teams Send Message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gmail Send Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow ID": {
+      "main": [
+        [
+          {
+            "node": "Execute Codex Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
@@ -163,7 +215,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "f30b8888-8a93-4f89-b096-b0596a76b449",
+  "versionId": "60f55bae-5e03-434b-b70e-543814706d4b",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "d0a98d1883d50ab1fb11f1c2089250d1d7492821be2ab8133be1cc4d824c5a45"
