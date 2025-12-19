@@ -36,7 +36,7 @@
         "url": "http://localhost:3000/workflow/execution",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ $('Workflow ID').item.json.body }}",
+        "jsonBody": "={{ $('UUID').item.json.body }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -50,7 +50,7 @@
     },
     {
       "parameters": {
-        "sendTo": "hoainhaannguyen@gmail.com",
+        "sendTo": "={{ $('Webhook').item.json.body.recipients.emails.join(', ') }}",
         "subject": "Codex Integration Workflow",
         "message": "={{ $json.stdout }}",
         "options": {}
@@ -141,7 +141,7 @@
         112
       ],
       "id": "c5b96594-d42c-4e54-9d9d-c8819a76ee0a",
-      "name": "Workflow ID"
+      "name": "UUID"
     }
   ],
   "pinData": {},
@@ -150,7 +150,7 @@
       "main": [
         [
           {
-            "node": "Workflow ID",
+            "node": "UUID",
             "type": "main",
             "index": 0
           }
@@ -199,7 +199,12 @@
         ]
       ]
     },
-    "Workflow ID": {
+    "Gmail Send Message": {
+      "main": [
+        []
+      ]
+    },
+    "UUID": {
       "main": [
         [
           {
@@ -215,7 +220,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "60f55bae-5e03-434b-b70e-543814706d4b",
+  "versionId": "d00ac1ad-5b04-4f72-99cd-1b39d9e5b6fb",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "d0a98d1883d50ab1fb11f1c2089250d1d7492821be2ab8133be1cc4d824c5a45"

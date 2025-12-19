@@ -13,7 +13,7 @@ npm i -g n8n
 Run below command in **Command Prompt**
 
 ```bash
-set NODES_EXCLUDE="[]" && n8n
+set NODES_EXCLUDE="[]" && set NODE_FUNCTION_ALLOW_EXTERNAL=uuid && n8n
 ```
 
 ## Import workflow
@@ -22,7 +22,7 @@ Import **Codex Integration Workflow.json** file to your n8n workflows
 
 ## Gmail
 
-Add your Gmail account Credential via Google Platform Gmail API
+Add your Gmail account Credential via Google Platform Gmail **API**
 
 ## MS Teams
 
