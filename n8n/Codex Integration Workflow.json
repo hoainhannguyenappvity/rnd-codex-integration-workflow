@@ -11,7 +11,7 @@
       "typeVersion": 2.1,
       "position": [
         0,
-        112
+        224
       ],
       "id": "706d0402-8bdc-4e1c-a8ce-5445760064ce",
       "name": "Webhook",
@@ -25,7 +25,7 @@
       "typeVersion": 1,
       "position": [
         448,
-        112
+        224
       ],
       "id": "fb39055a-b5b0-45c8-b792-6061c238522f",
       "name": "Execute Codex Prompt"
@@ -43,7 +43,7 @@
       "typeVersion": 4.3,
       "position": [
         672,
-        208
+        320
       ],
       "id": "afaab1e0-123a-4551-86c2-f9725f2369a8",
       "name": "Socket.IO"
@@ -52,14 +52,14 @@
       "parameters": {
         "sendTo": "={{ $('Webhook').item.json.body.recipients.emails.join(', ') }}",
         "subject": "Codex Integration Workflow",
-        "message": "={{ $json.stdout }}",
+        "message": "={{ $json.data }}",
         "options": {}
       },
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        896,
-        -80
+        1120,
+        32
       ],
       "id": "68f166fb-f66c-404d-9dbe-91fe20164e59",
       "name": "Gmail Send Message",
@@ -88,14 +88,14 @@
           "cachedResultUrl": "https://teams.cloud.microsoft/l/channel/19%3AKhGX9jZOR_wDXqvq-EtbXw4gnvZYSAnr6ZDhQpNiaBw1%40thread.tacv2/R%26D%20Discussion?groupId=05432cd9-d2b3-4e44-8212-28405f17eba4&tenantId=bfe53760-c13f-4271-9e14-60cf6e1727b8&allowXTenantAccess=True&ngc=True"
         },
         "contentType": "html",
-        "message": "={{ $json.stdout }}",
+        "message": "={{ $json.data }}",
         "options": {}
       },
       "type": "n8n-nodes-base.microsoftTeams",
       "typeVersion": 2,
       "position": [
-        896,
-        112
+        1120,
+        224
       ],
       "id": "c13949d4-2679-4ef9-a9bd-ef418a1eca0b",
       "name": "MS Teams Send Message",
@@ -125,7 +125,7 @@
       "typeVersion": 3.4,
       "position": [
         672,
-        16
+        128
       ],
       "id": "6cb87d58-3916-4b9b-b391-fe0f9e59058b",
       "name": "Mapping Data"
@@ -138,10 +138,25 @@
       "typeVersion": 2,
       "position": [
         224,
-        112
+        224
       ],
       "id": "c5b96594-d42c-4e54-9d9d-c8819a76ee0a",
       "name": "UUID"
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.stdout }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        896,
+        128
+      ],
+      "id": "0e85c486-7569-48de-9d3a-5e88e580c57d",
+      "name": "Markdown"
     }
   ],
   "pinData": {},
@@ -187,12 +202,7 @@
       "main": [
         [
           {
-            "node": "MS Teams Send Message",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Gmail Send Message",
+            "node": "Markdown",
             "type": "main",
             "index": 0
           }
@@ -214,13 +224,29 @@
           }
         ]
       ]
+    },
+    "Markdown": {
+      "main": [
+        [
+          {
+            "node": "Gmail Send Message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "MS Teams Send Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "d00ac1ad-5b04-4f72-99cd-1b39d9e5b6fb",
+  "versionId": "8537c01c-bd3b-4470-8ce7-48c8e008985f",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "d0a98d1883d50ab1fb11f1c2089250d1d7492821be2ab8133be1cc4d824c5a45"
