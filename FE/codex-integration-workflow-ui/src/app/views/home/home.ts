@@ -1,5 +1,5 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { Component, inject, signal } from '@angular/core';
+import { afterNextRender, ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -7,11 +7,12 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
-// import { N8NAPI } from '../../services/n8n';
-import { MatListModule } from '@angular/material/list';
+import { io } from 'socket.io-client';
+import { N8NAPI } from '../../services/n8n';
 import { N8NExecutionStore } from '../../stores/n8n-execution-store';
 
 @Component({
@@ -37,16 +38,50 @@ import { N8NExecutionStore } from '../../stores/n8n-execution-store';
   },
 })
 export class Home {
-  // readonly #n8nAPI = inject(N8NAPI);
-  readonly n8nExecutionStore = inject(N8NExecutionStore);
+  readonly cdr = inject(ChangeDetectorRef);
 
   showLoading = signal(false);
 
+  // n8n
+  readonly #n8nAPI = inject(N8NAPI);
+  readonly n8nExecutionStore = inject(N8NExecutionStore);
+
+  // Prompt
   prompt = 'Review the latest master-branch commit and produce a summary.';
 
-  // #region Emails
+  // Emails
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
   readonly emails = signal<any[]>(['hoainhaannguyen@gmail.com']);
+
+  // Socket.IO
+  socket = io('http://localhost:3000', {
+    withCredentials: true,
+    transports: ['websocket', 'polling'],
+    autoConnect: false,
+  });
+
+  constructor() {
+    afterNextRender(() => {
+      this.socket.connect();
+
+      this.socket.on('message', (message) => {
+        console.log('Socket.IO message ::', message);
+
+        const { execution } = message;
+
+        if (execution) {
+          this.n8nExecutionStore.add({
+            short: execution.prompt.split('\n')[0],
+            data: execution,
+            date: new Date().toString(),
+            status: 'Success',
+          });
+
+          this.cdr.detectChanges();
+        }
+      });
+    });
+  }
 
   addEmail(event: any) {
     const value = (event.value || '').trim();
@@ -91,7 +126,6 @@ export class Home {
       return emails;
     });
   }
-  // #endregion
 
   sendPrompt() {
     const submitData = {
@@ -103,31 +137,16 @@ export class Home {
     };
 
     this.showLoading.set(true);
-    const timeoutId = setTimeout(() => {
-      clearTimeout(timeoutId);
+    this.#n8nAPI.triggerWebhook(submitData).subscribe(() => {
+      const timeoutId = setTimeout(() => {
+        clearTimeout(timeoutId);
 
-      this.n8nExecutionStore.add({
-        short: this.prompt.split('\n')[0],
-        data: submitData,
-        date: new Date().toString(),
-        status: 'Success',
-      });
+        this.showLoading.set(false);
+      }, 3000);
+    });
+  }
 
-      this.showLoading.set(false);
-    }, 3000);
-
-    // this.showLoading.set(true);
-    // this.#n8nAPI.triggerWebhook(submitData).subscribe(() => {
-    //   this.#n8nExecutionStore.add({
-    //     id: new Date().getTime(),
-    //     data: submitData,
-    //   });
-
-    //   const timeoutId = setTimeout(() => {
-    //     clearTimeout(timeoutId);
-
-    //     this.showLoading.set(false);
-    //   }, 3000);
-    // });
+  ngOnDestroy() {
+    this.socket?.disconnect();
   }
 }

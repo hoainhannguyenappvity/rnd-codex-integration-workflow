@@ -1,1 +1,1 @@
-set NODES_EXCLUDE="[]" && n8n
+set NODES_EXCLUDE="[]" && set NODE_FUNCTION_ALLOW_EXTERNAL=uuid && n8n

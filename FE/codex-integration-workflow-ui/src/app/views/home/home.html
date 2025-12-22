@@ -60,7 +60,7 @@
   <mat-tab label="Executions">
     <section class="block p-4">
       <mat-list role="list" class="flex! flex-col gap-4">
-        @for (item of n8nExecutionStore.executions(); track item.id) {
+        @for (item of n8nExecutionStore.executions(); track item.date) {
           <mat-list-item role="listitem" [class.border-l-4!]="item.status === 'Success'" [class.border-green-500!]="item.status === 'Success'">
             <p class="text-xl font-medium">{{ item.short }}</p>
             <span [class.text-green-500]="item.status === 'Success'">{{ item.status }}</span> in {{ item.date }}
