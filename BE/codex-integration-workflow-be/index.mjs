@@ -42,6 +42,14 @@ app.post('/workflow/execution', (req, res) => {
   res.status(201).json(req.body);
 });
 
+app.post('/workflow/channels', (req, res) => {
+  console.log('Channels ::', req.body);
+  io.emit('message', {
+    channels: req.body,
+  });
+  res.status(201).json(req.body);
+});
+
 server.listen(3000, () => {
   console.log('🚀 Server running on http://localhost:3000');
 });
