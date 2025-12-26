@@ -3,28 +3,12 @@
   "nodes": [
     {
       "parameters": {
-        "httpMethod": "POST",
-        "path": "codex-integration-workflow",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2.1,
-      "position": [
-        0,
-        224
-      ],
-      "id": "706d0402-8bdc-4e1c-a8ce-5445760064ce",
-      "name": "Webhook",
-      "webhookId": "34ecdc6f-9f42-46a8-85b9-ac20510365da"
-    },
-    {
-      "parameters": {
         "command": "=codex exec \"{{ $json.body.prompt }}\" --json"
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        448,
+        432,
         224
       ],
       "id": "fb39055a-b5b0-45c8-b792-6061c238522f",
@@ -32,25 +16,7 @@
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "http://localhost:3000/workflow/execution",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ $('UUID').item.json.body }}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
-      "position": [
-        672,
-        320
-      ],
-      "id": "afaab1e0-123a-4551-86c2-f9725f2369a8",
-      "name": "Socket.IO"
-    },
-    {
-      "parameters": {
-        "sendTo": "={{ $('Webhook').item.json.body.recipients.emails.join(', ') }}",
+        "sendTo": "={{ $('Codex Webhook').item.json.body.recipients.emails.join(', ') }}",
         "subject": "Codex Integration Workflow",
         "message": "={{ $json.data }}",
         "options": {}
@@ -58,7 +24,7 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        1120,
+        1104,
         32
       ],
       "id": "68f166fb-f66c-404d-9dbe-91fe20164e59",
@@ -69,7 +35,8 @@
           "id": "tlS2tP7X2B1KvXCg",
           "name": "Gmail account"
         }
-      }
+      },
+      "disabled": true
     },
     {
       "parameters": {
@@ -94,7 +61,7 @@
       "type": "n8n-nodes-base.microsoftTeams",
       "typeVersion": 2,
       "position": [
-        1120,
+        1104,
         224
       ],
       "id": "c13949d4-2679-4ef9-a9bd-ef418a1eca0b",
@@ -105,7 +72,8 @@
           "id": "x9gWBs65kuWF62zf",
           "name": "Microsoft Teams account"
         }
-      }
+      },
+      "disabled": true
     },
     {
       "parameters": {
@@ -124,24 +92,11 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        672,
+        656,
         128
       ],
       "id": "6cb87d58-3916-4b9b-b391-fe0f9e59058b",
       "name": "Mapping Data"
-    },
-    {
-      "parameters": {
-        "jsCode": "const uuid = require('uuid');\n\n// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.body.id = uuid.v4();\n}\n\nreturn $input.all();"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        224,
-        224
-      ],
-      "id": "c5b96594-d42c-4e54-9d9d-c8819a76ee0a",
-      "name": "UUID"
     },
     {
       "parameters": {
@@ -152,31 +107,160 @@
       "type": "n8n-nodes-base.markdown",
       "typeVersion": 1,
       "position": [
-        896,
+        880,
         128
       ],
       "id": "0e85c486-7569-48de-9d3a-5e88e580c57d",
       "name": "Markdown"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "codex-integration-workflow",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        224
+      ],
+      "id": "706d0402-8bdc-4e1c-a8ce-5445760064ce",
+      "name": "Codex Webhook",
+      "webhookId": "34ecdc6f-9f42-46a8-85b9-ac20510365da"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "teamId": {
+          "__rl": true,
+          "value": "05432cd9-d2b3-4e44-8212-28405f17eba4",
+          "mode": "list",
+          "cachedResultName": "RnD Discussion"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.microsoftTeams",
+      "typeVersion": 2,
+      "position": [
+        432,
+        544
+      ],
+      "id": "20dd3afc-89e5-42fc-beb2-a626c5358688",
+      "name": "Get many channels",
+      "webhookId": "7e8de5df-632d-4ee6-b74c-5654406b8688",
+      "credentials": {
+        "microsoftTeamsOAuth2Api": {
+          "id": "x9gWBs65kuWF62zf",
+          "name": "Microsoft Teams account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/workflow/execution",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Codex Webhook UUID').item.json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        656,
+        320
+      ],
+      "id": "afaab1e0-123a-4551-86c2-f9725f2369a8",
+      "name": "Socket.IO Execution"
+    },
+    {
+      "parameters": {
+        "jsCode": "const uuid = require('uuid');\n\n// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.body.id = uuid.v4();\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        224
+      ],
+      "id": "c5b96594-d42c-4e54-9d9d-c8819a76ee0a",
+      "name": "Codex Webhook UUID"
+    },
+    {
+      "parameters": {
+        "jsCode": "const uuid = require('uuid');\n\n// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.body.id = uuid.v4();\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        544
+      ],
+      "id": "77b58fe3-e331-47e6-ac8b-1d87b7788183",
+      "name": "MS Teams Channels UUID",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        656,
+        544
+      ],
+      "id": "a0955832-7fa6-4d4b-b7d5-23f8e62be758",
+      "name": "Aggregate",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/workflow/channels",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.data }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        880,
+        544
+      ],
+      "id": "ef9395eb-1964-4099-ae3d-891e44408d16",
+      "name": "Socket.IO Channels",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "channels",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        544
+      ],
+      "id": "5637c5da-8082-4d54-a02a-83dc52a6e933",
+      "name": "Channels Webhook",
+      "webhookId": "e3c01382-5942-44f4-b7c0-f41d5819bf8b",
+      "disabled": true
     }
   ],
   "pinData": {},
   "connections": {
-    "Webhook": {
-      "main": [
-        [
-          {
-            "node": "UUID",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Execute Codex Prompt": {
       "main": [
         [
           {
-            "node": "Socket.IO",
+            "node": "Socket.IO Execution",
             "type": "main",
             "index": 0
           },
@@ -186,11 +270,6 @@
             "index": 0
           }
         ]
-      ]
-    },
-    "Socket.IO": {
-      "main": [
-        []
       ]
     },
     "MS Teams Send Message": {
@@ -214,17 +293,6 @@
         []
       ]
     },
-    "UUID": {
-      "main": [
-        [
-          {
-            "node": "Execute Codex Prompt",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Markdown": {
       "main": [
         [
@@ -240,13 +308,84 @@
           }
         ]
       ]
+    },
+    "Codex Webhook": {
+      "main": [
+        [
+          {
+            "node": "Codex Webhook UUID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many channels": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Socket.IO Execution": {
+      "main": [
+        []
+      ]
+    },
+    "Codex Webhook UUID": {
+      "main": [
+        [
+          {
+            "node": "Execute Codex Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MS Teams Channels UUID": {
+      "main": [
+        [
+          {
+            "node": "Get many channels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Socket.IO Channels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Channels Webhook": {
+      "main": [
+        [
+          {
+            "node": "MS Teams Channels UUID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "8537c01c-bd3b-4470-8ce7-48c8e008985f",
+  "versionId": "84c7a592-e435-4b1e-9a7d-6d3249a4e262",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "d0a98d1883d50ab1fb11f1c2089250d1d7492821be2ab8133be1cc4d824c5a45"

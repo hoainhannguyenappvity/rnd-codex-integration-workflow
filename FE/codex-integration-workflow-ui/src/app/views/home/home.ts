@@ -53,6 +53,30 @@ export class Home {
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
   readonly emails = signal<any[]>(['hoainhaannguyen@gmail.com']);
 
+  // Teams
+  teams = signal<any[]>([
+    {
+      id: 'None',
+      displayName: 'None',
+    },
+    {
+      id: 'RnD Discussion',
+      displayName: 'RnD Discussion',
+    },
+  ]);
+
+  // Channels
+  channels = signal<any[]>([
+    {
+      id: 'None',
+      displayName: 'None',
+    },
+    {
+      id: 'General',
+      displayName: 'General',
+    },
+  ]);
+
   // Socket.IO
   socket = io('http://localhost:3000', {
     withCredentials: true,
@@ -76,7 +100,6 @@ export class Home {
             date: new Date().toString(),
             status: 'Success',
           });
-
           this.cdr.detectChanges();
         }
       });
@@ -132,12 +155,13 @@ export class Home {
       prompt: this.prompt,
       recipients: {
         emails: this.emails(),
-        channels: ['MS Teams > RnD Discussion > General'],
+        teams: ['RnD Discussion'],
+        channels: ['General'],
       },
     };
 
     this.showLoading.set(true);
-    this.#n8nAPI.triggerWebhook(submitData).subscribe(() => {
+    this.#n8nAPI.triggerCodexWebhook(submitData).subscribe(() => {
       const timeoutId = setTimeout(() => {
         clearTimeout(timeoutId);
 
