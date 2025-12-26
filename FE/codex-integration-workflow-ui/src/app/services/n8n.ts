@@ -5,7 +5,7 @@ import { APIS } from '../enums/apis';
 @Injectable({
   providedIn: 'root',
 })
-export class N8NAPI {
+export class N8nAPI {
   readonly #http = inject(HttpClient);
 
   triggerWebhook(data: any) {

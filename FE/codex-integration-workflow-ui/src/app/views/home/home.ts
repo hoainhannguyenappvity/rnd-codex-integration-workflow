@@ -12,7 +12,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { io } from 'socket.io-client';
-import { N8NAPI } from '../../services/n8n';
+import { N8nAPI } from '../../services/n8n';
 import { N8NExecutionStore } from '../../stores/n8n-execution-store';
 
 @Component({
@@ -43,7 +43,7 @@ export class Home {
   showLoading = signal(false);
 
   // n8n
-  readonly #n8nAPI = inject(N8NAPI);
+  readonly #n8nAPI = inject(N8nAPI);
   readonly n8nExecutionStore = inject(N8NExecutionStore);
 
   // Prompt
