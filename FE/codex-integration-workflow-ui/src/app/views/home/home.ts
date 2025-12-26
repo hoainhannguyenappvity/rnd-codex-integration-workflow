@@ -1,5 +1,5 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { afterNextRender, ChangeDetectorRef, Component, inject, signal } from '@angular/core';
+import { afterNextRender, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -38,8 +38,6 @@ import { N8NExecutionStore } from '../../stores/n8n-execution-store';
   },
 })
 export class Home {
-  readonly cdr = inject(ChangeDetectorRef);
-
   showLoading = signal(false);
 
   // n8n
@@ -100,7 +98,6 @@ export class Home {
             date: new Date().toString(),
             status: 'Success',
           });
-          this.cdr.detectChanges();
         }
       });
     });
