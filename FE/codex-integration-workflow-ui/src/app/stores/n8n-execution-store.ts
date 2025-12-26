@@ -5,6 +5,6 @@ export class N8NExecutionStore {
   readonly executions = signal<any[]>([]);
 
   add(item: any) {
-    this.executions().push(item);
+    this.executions.update((executions) => [item, ...executions]);
   }
 }
