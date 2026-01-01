@@ -1,7 +1,7 @@
 <mat-tab-group animationDuration="0ms">
   <mat-tab label="Workflow">
     <section class="flex flex-col gap-24 p-4">
-      <section class="flex flex-col">
+      <!-- <section class="flex flex-col">
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Prompt</mat-label>
           <textarea matInput rows="4" placeholder="Ex. Review the latest master-branch commit and produce a summary." [(ngModel)]="prompt"></textarea>
@@ -13,14 +13,14 @@
           }
           Send
         </button>
-      </section>
+      </section> -->
 
       <section class="flex flex-col gap-4 bg-gray-100 p-4">
         <h2 class="text-2xl font-medium">Repository</h2>
 
         <h4 class="text-xl font-medium">{{ repository().name }} ({{ repository().owner.login }})</h4>
         <section class="flex flex-row gap-4">
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" class="w-full">
             <mat-label>Select a Pull Request</mat-label>
             <mat-select [(ngModel)]="selectedPullRequestNumber" canSelectNullableOptions>
               @for (pullRequest of pullRequests(); track pullRequest.number) {
@@ -29,6 +29,13 @@
             </mat-select>
           </mat-form-field>
         </section>
+
+        <button matButton="tonal" class="w-24! self-end" (click)="sendPrompt()" [disabled]="!prompt || showLoading()">
+          @if (showLoading()) {
+            <mat-spinner [diameter]="24" class="absolute! -top-0.5 left-1"></mat-spinner>
+          }
+          Send
+        </button>
       </section>
 
       <section class="flex flex-col gap-4 bg-gray-100 p-4">
@@ -80,9 +87,9 @@
   <mat-tab label="Executions">
     <section class="block p-4">
       <mat-list role="list" class="flex! flex-col gap-4">
-        @for (item of n8nExecutionStore.executions(); track item.date) {
+        @for (item of n8nExecutionsStore.executions(); track item.date) {
           <mat-list-item role="listitem" [class.border-l-4!]="item.status === 'Success'" [class.border-green-500!]="item.status === 'Success'">
-            <p class="text-xl font-medium">{{ item.short }}</p>
+            <p class="text-xl font-medium">{{ item.title }}</p>
             <span [class.text-green-500]="item.status === 'Success'">{{ item.status }}</span> in {{ item.date }}
           </mat-list-item>
         } @empty {

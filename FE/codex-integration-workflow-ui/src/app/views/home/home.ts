@@ -12,8 +12,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { io } from 'socket.io-client';
-import { N8nAPI } from '../../services/n8n';
-import { N8NExecutionStore } from '../../stores/n8n-execution-store';
+import { N8nApi } from '../../services/n8n';
+import { N8nExecutionsStore } from '../../stores/n8n-executions-store';
 
 @Component({
   selector: 'app-home',
@@ -30,7 +30,7 @@ import { N8NExecutionStore } from '../../stores/n8n-execution-store';
     MatProgressSpinnerModule,
     MatListModule,
   ],
-  providers: [N8NExecutionStore],
+  providers: [N8nExecutionsStore],
   templateUrl: './home.html',
   styleUrl: './home.css',
   host: {
@@ -41,11 +41,12 @@ export class Home {
   showLoading = signal(false);
 
   // n8n
-  readonly #n8nAPI = inject(N8nAPI);
-  readonly n8nExecutionStore = inject(N8NExecutionStore);
+  readonly n8nApi = inject(N8nApi);
+  readonly n8nExecutionsStore = inject(N8nExecutionsStore);
 
   // Prompt
-  prompt = 'Review the latest master-branch commit and produce a summary.';
+  prompt =
+    'Act as a senior web developer and conduct a comprehensive code review of this pull request. Analyze the commits, evaluate code quality, identify potential bugs, security issues, performance concerns, and adherence to best practices. Provide specific suggestions for improvement with examples where applicable.';
 
   // Emails
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
@@ -104,8 +105,8 @@ export class Home {
         const { execution, teams, channels, pullRequests, repository } = message;
 
         if (execution) {
-          this.n8nExecutionStore.add({
-            short: execution.prompt.split('\n')[0],
+          this.n8nExecutionsStore.add({
+            title: `${execution.repository.name} (${execution.repository.owner.login}) #${execution.pullRequest.number} - ${execution.pullRequest.title}`,
             data: execution,
             date: new Date().toString(),
             status: 'Success',
@@ -147,21 +148,21 @@ export class Home {
         }
       });
 
-      this.#n8nAPI
+      this.n8nApi
         .triggerWorkflow({
           resource: 'teams',
           data: null,
         })
         .subscribe();
 
-      this.#n8nAPI
+      this.n8nApi
         .triggerWorkflow({
           resource: 'repository',
           data: null,
         })
         .subscribe();
 
-      this.#n8nAPI
+      this.n8nApi
         .triggerWorkflow({
           resource: 'pull-requests',
           data: null,
@@ -220,7 +221,7 @@ export class Home {
     this.selectedTeamId = teamId;
     this.selectedChannelId = '';
 
-    this.#n8nAPI
+    this.n8nApi
       .triggerWorkflow({
         resource: 'channels',
         teamId,
@@ -230,8 +231,8 @@ export class Home {
 
   sendPrompt() {
     const data = {
-      prompt: this.prompt,
-      pullRequest: this.pullRequests().find((pr) => pr.number === this.selectedPullRequestNumber) || null,
+      // prompt: this.prompt,
+      pullRequest: this.pullRequests().find((pr) => pr.number === this.selectedPullRequestNumber),
       repository: this.repository(),
       recipients: {
         emails: this.emails(),
@@ -241,7 +242,7 @@ export class Home {
     };
 
     this.showLoading.set(true);
-    this.#n8nAPI
+    this.n8nApi
       .triggerWorkflow({
         resource: 'codex',
         ...data,

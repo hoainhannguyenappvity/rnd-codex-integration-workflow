@@ -240,7 +240,7 @@
     },
     {
       "parameters": {
-        "command": "=codex exec \"{{ $json.body.prompt }}\" --json"
+        "command": "=codex exec \"Act as a senior web developer and tech lead. Execute 'gh pr diff {{ $json.body.pullRequest.number }}' to get the pull request changes, then perform a thorough code review covering: (1) Code quality and maintainability, (2) Potential bugs and edge cases, (3) Security vulnerabilities, (4) Performance concerns, (5) TypeScript/type safety issues, (6) Error handling and validation, (7) Adherence to framework best practices, (8) Code consistency and style, (9) Testing coverage gaps, (10) Breaking changes or backward compatibility. Organize feedback by priority (Critical/High/Medium/Low), provide specific code examples for improvements, and conclude with a clear merge recommendation (Approve/Approve with changes/Request changes/Reject) with reasoning. No conversational text, markdown only.\" --json --sandbox=danger-full-access"
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
@@ -691,7 +691,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "783c93e1-b233-48b3-ac11-d973d89e0127",
+  "versionId": "03603bae-c216-42d4-9659-955e57571e02",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "d0a98d1883d50ab1fb11f1c2089250d1d7492821be2ab8133be1cc4d824c5a45"
