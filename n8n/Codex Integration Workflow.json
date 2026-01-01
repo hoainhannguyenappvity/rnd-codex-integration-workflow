@@ -46,7 +46,7 @@
       "typeVersion": 2,
       "position": [
         1312,
-        224
+        416
       ],
       "id": "c13949d4-2679-4ef9-a9bd-ef418a1eca0b",
       "name": "MS Teams Send Message",
@@ -193,7 +193,7 @@
       "typeVersion": 2.1,
       "position": [
         -32,
-        608
+        704
       ],
       "id": "706d0402-8bdc-4e1c-a8ce-5445760064ce",
       "name": "Codex",
@@ -206,13 +206,13 @@
         "url": "http://localhost:3000/workflow/pull-requests",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ $json.commits }}",
+        "jsonBody": "={{ $json.data }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        1088,
+        1312,
         896
       ],
       "id": "cbd2c362-888a-4263-a392-d8ddbbe47445",
@@ -260,7 +260,7 @@
       "typeVersion": 2,
       "position": [
         192,
-        608
+        704
       ],
       "id": "c5b96594-d42c-4e54-9d9d-c8819a76ee0a",
       "name": "Workflow UUID",
@@ -347,6 +347,29 @@
                 },
                 "conditions": [
                   {
+                    "id": "ed490c08-e97b-4296-b91c-cfc38a4283c4",
+                    "leftValue": "={{ $json.body.resource }}",
+                    "rightValue": "repository",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
                     "id": "a07a36a3-4dc5-4f67-8333-6e17c8aad4bb",
                     "leftValue": "={{ $json.body.resource }}",
                     "rightValue": "pull-requests",
@@ -368,7 +391,7 @@
       "typeVersion": 3.4,
       "position": [
         416,
-        576
+        656
       ],
       "id": "30815e7d-1b99-4902-b285-d1ed3c5d75fb",
       "name": "Switch",
@@ -400,6 +423,68 @@
       ],
       "id": "b058ff95-c02a-4d14-ae32-d2b9b4234604",
       "name": "JSON Parse Pull Requests",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/workflow/repository",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1088,
+        1088
+      ],
+      "id": "ba3f8e72-4ad0-4aa5-9fcc-f78334218425",
+      "name": "Socket.IO Repo",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "command": "gh repo view --json name,owner"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        640,
+        1088
+      ],
+      "id": "a3ccd70e-9c12-497a-9138-292a221745ba",
+      "name": "Get Repository",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return JSON.parse($input.first().json.stdout);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        864,
+        1088
+      ],
+      "id": "ec9dcf8b-1984-4fe9-8860-21ca0bf59dd9",
+      "name": "JSON Parse Reposistory",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        896
+      ],
+      "id": "0e04f422-407e-43c1-9878-0102ca096752",
+      "name": "Aggregate Pull Requests",
       "disabled": true
     }
   ],
@@ -532,6 +617,13 @@
         ],
         [
           {
+            "node": "Get Repository",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
             "node": "Get Pull Requests",
             "type": "main",
             "index": 0
@@ -554,6 +646,39 @@
       "main": [
         [
           {
+            "node": "Aggregate Pull Requests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Repository": {
+      "main": [
+        [
+          {
+            "node": "JSON Parse Reposistory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JSON Parse Reposistory": {
+      "main": [
+        [
+          {
+            "node": "Socket.IO Repo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Pull Requests": {
+      "main": [
+        [
+          {
             "node": "Socket.IO Pull Requests",
             "type": "main",
             "index": 0
@@ -566,7 +691,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "251d2d7e-5403-4135-8386-d14d426e3bfd",
+  "versionId": "783c93e1-b233-48b3-ac11-d973d89e0127",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "d0a98d1883d50ab1fb11f1c2089250d1d7492821be2ab8133be1cc4d824c5a45"
