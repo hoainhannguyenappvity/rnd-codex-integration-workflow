@@ -1,14 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { APIS } from '../enums/apis';
+import { apis } from '../enums/apis';
 
 @Injectable({
   providedIn: 'root',
 })
-export class N8nAPI {
-  readonly #http = inject(HttpClient);
+export class N8nApi {
+  readonly http = inject(HttpClient);
 
   triggerWorkflow(data: any) {
-    return this.#http.post(APIS.n8n.webhook.codexIntegrationWorkflow, data);
+    return this.http.post(apis.n8n.webhook.codexIntegrationWorkflow, data);
   }
 }

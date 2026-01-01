@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 
 @Injectable()
-export class N8NExecutionStore {
+export class N8nExecutionsStore {
   readonly executions = signal<any[]>([]);
 
   add(item: any) {
