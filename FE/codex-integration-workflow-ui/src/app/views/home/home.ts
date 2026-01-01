@@ -52,26 +52,28 @@ export class Home {
   readonly emails = signal<any[]>(['hoainhaannguyen@gmail.com']);
 
   // Teams
+  selectedTeamId = '';
   teams = signal<any[]>([
     {
-      id: 'None',
+      id: '',
       displayName: 'None',
-    },
-    {
-      id: 'RnD Discussion',
-      displayName: 'RnD Discussion',
     },
   ]);
 
   // Channels
+  selectedChannelId = '';
   channels = signal<any[]>([
     {
-      id: 'None',
+      id: '',
       displayName: 'None',
     },
+  ]);
+
+  // Pull Requests
+  pullRequests = signal<any[]>([
     {
-      id: 'General',
-      displayName: 'General',
+      id: '',
+      title: 'None',
     },
   ]);
 
@@ -89,7 +91,7 @@ export class Home {
       this.socket.on('message', (message) => {
         console.log('Socket.IO message ::', message);
 
-        const { execution } = message;
+        const { execution, teams, channels, pullRequests, commits } = message;
 
         if (execution) {
           this.n8nExecutionStore.add({
@@ -99,7 +101,44 @@ export class Home {
             status: 'Success',
           });
         }
+
+        if (teams) {
+          this.teams.set([
+            {
+              id: '',
+              displayName: 'None',
+            },
+            ...teams,
+          ]);
+        }
+
+        if (channels) {
+          this.channels.set([
+            {
+              id: '',
+              displayName: 'None',
+            },
+            ...channels,
+          ]);
+        }
+
+        if (pullRequests) {
+          this.pullRequests.set([
+            {
+              id: '',
+              title: 'None',
+            },
+            ...pullRequests,
+          ]);
+        }
       });
+
+      this.#n8nAPI
+        .triggerWorkflow({
+          resource: 'teams',
+          data: null,
+        })
+        .subscribe();
     });
   }
 
@@ -147,24 +186,43 @@ export class Home {
     });
   }
 
+  onTeamChange(event: any) {
+    const teamId = event.value;
+
+    this.selectedTeamId = teamId;
+    this.selectedChannelId = '';
+
+    this.#n8nAPI
+      .triggerWorkflow({
+        resource: 'channels',
+        teamId,
+      })
+      .subscribe();
+  }
+
   sendPrompt() {
-    const submitData = {
+    const data = {
       prompt: this.prompt,
       recipients: {
         emails: this.emails(),
-        teams: ['RnD Discussion'],
-        channels: ['General'],
+        teamId: this.selectedTeamId,
+        channelId: this.selectedChannelId,
       },
     };
 
     this.showLoading.set(true);
-    this.#n8nAPI.triggerCodexWebhook(submitData).subscribe(() => {
-      const timeoutId = setTimeout(() => {
-        clearTimeout(timeoutId);
+    this.#n8nAPI
+      .triggerWorkflow({
+        resource: 'codex',
+        ...data,
+      })
+      .subscribe(() => {
+        const timeoutId = setTimeout(() => {
+          clearTimeout(timeoutId);
 
-        this.showLoading.set(false);
-      }, 3000);
-    });
+          this.showLoading.set(false);
+        }, 3000);
+      });
   }
 
   ngOnDestroy() {

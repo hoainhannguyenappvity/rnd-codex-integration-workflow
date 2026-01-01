@@ -3,20 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "command": "=codex exec \"{{ $json.body.prompt }}\" --json"
-      },
-      "type": "n8n-nodes-base.executeCommand",
-      "typeVersion": 1,
-      "position": [
-        432,
-        224
-      ],
-      "id": "fb39055a-b5b0-45c8-b792-6061c238522f",
-      "name": "Execute Codex Prompt"
-    },
-    {
-      "parameters": {
-        "sendTo": "={{ $('Codex Webhook').item.json.body.recipients.emails.join(', ') }}",
+        "sendTo": "={{ $('Codex').item.json.body.recipients.emails.join(', ') }}",
         "subject": "Codex Integration Workflow",
         "message": "={{ $json.data }}",
         "options": {}
@@ -24,7 +11,7 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        1104,
+        1312,
         32
       ],
       "id": "68f166fb-f66c-404d-9dbe-91fe20164e59",
@@ -43,16 +30,13 @@
         "resource": "channelMessage",
         "teamId": {
           "__rl": true,
-          "value": "05432cd9-d2b3-4e44-8212-28405f17eba4",
-          "mode": "list",
-          "cachedResultName": "RnD Discussion"
+          "value": "={{ $json.body.recipients.teamId }}",
+          "mode": "id"
         },
         "channelId": {
           "__rl": true,
-          "value": "19:KhGX9jZOR_wDXqvq-EtbXw4gnvZYSAnr6ZDhQpNiaBw1@thread.tacv2",
-          "mode": "list",
-          "cachedResultName": "General",
-          "cachedResultUrl": "https://teams.cloud.microsoft/l/channel/19%3AKhGX9jZOR_wDXqvq-EtbXw4gnvZYSAnr6ZDhQpNiaBw1%40thread.tacv2/R%26D%20Discussion?groupId=05432cd9-d2b3-4e44-8212-28405f17eba4&tenantId=bfe53760-c13f-4271-9e14-60cf6e1727b8&allowXTenantAccess=True&ngc=True"
+          "value": "={{ $json.body.recipients.channelId }}",
+          "mode": "id"
         },
         "contentType": "html",
         "message": "={{ $json.data }}",
@@ -61,7 +45,7 @@
       "type": "n8n-nodes-base.microsoftTeams",
       "typeVersion": 2,
       "position": [
-        1104,
+        1312,
         224
       ],
       "id": "c13949d4-2679-4ef9-a9bd-ef418a1eca0b",
@@ -92,11 +76,12 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        656,
+        864,
         128
       ],
       "id": "6cb87d58-3916-4b9b-b391-fe0f9e59058b",
-      "name": "Mapping Data"
+      "name": "Mapping Data",
+      "disabled": true
     },
     {
       "parameters": {
@@ -107,11 +92,96 @@
       "type": "n8n-nodes-base.markdown",
       "typeVersion": 1,
       "position": [
-        880,
+        1088,
         128
       ],
       "id": "0e85c486-7569-48de-9d3a-5e88e580c57d",
-      "name": "Markdown"
+      "name": "Markdown",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/workflow/execution",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Workflow UUID').item.json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        864,
+        320
+      ],
+      "id": "afaab1e0-123a-4551-86c2-f9725f2369a8",
+      "name": "Socket.IO Execution",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://graph.microsoft.com/v1.0/me/joinedTeams",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        640,
+        512
+      ],
+      "id": "682568b6-e9d0-482e-80dd-e57e919ee23f",
+      "name": "Get Joined Teams",
+      "credentials": {
+        "microsoftOAuth2Api": {
+          "id": "HV48bQRRcy9MJJPv",
+          "name": "Microsoft account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/workflow/teams",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.value }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        864,
+        512
+      ],
+      "id": "36043ab2-8bc1-4866-af70-35fefc0c598c",
+      "name": "Socket.IO Joined Teams",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.microsoft.com/v1.0/teams/{{$json.body.teamId}}/channels",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        640,
+        704
+      ],
+      "id": "159a0b5d-ee0f-40a0-a00c-50c8b5a05f19",
+      "name": "Get Channels",
+      "credentials": {
+        "microsoftOAuth2Api": {
+          "id": "HV48bQRRcy9MJJPv",
+          "name": "Microsoft account"
+        }
+      },
+      "disabled": true
     },
     {
       "parameters": {
@@ -122,99 +192,31 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -16,
-        224
+        -32,
+        608
       ],
       "id": "706d0402-8bdc-4e1c-a8ce-5445760064ce",
-      "name": "Codex Webhook",
-      "webhookId": "34ecdc6f-9f42-46a8-85b9-ac20510365da"
-    },
-    {
-      "parameters": {
-        "operation": "getAll",
-        "teamId": {
-          "__rl": true,
-          "value": "05432cd9-d2b3-4e44-8212-28405f17eba4",
-          "mode": "list",
-          "cachedResultName": "RnD Discussion"
-        },
-        "returnAll": true
-      },
-      "type": "n8n-nodes-base.microsoftTeams",
-      "typeVersion": 2,
-      "position": [
-        432,
-        544
-      ],
-      "id": "20dd3afc-89e5-42fc-beb2-a626c5358688",
-      "name": "Get many channels",
-      "webhookId": "7e8de5df-632d-4ee6-b74c-5654406b8688",
-      "credentials": {
-        "microsoftTeamsOAuth2Api": {
-          "id": "x9gWBs65kuWF62zf",
-          "name": "Microsoft Teams account"
-        }
-      },
+      "name": "Codex",
+      "webhookId": "34ecdc6f-9f42-46a8-85b9-ac20510365da",
       "disabled": true
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "http://localhost:3000/workflow/execution",
+        "url": "http://localhost:3000/workflow/pull-requests",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ $('Codex Webhook UUID').item.json.body }}",
+        "jsonBody": "={{ $json.commits }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        656,
-        320
+        1088,
+        896
       ],
-      "id": "afaab1e0-123a-4551-86c2-f9725f2369a8",
-      "name": "Socket.IO Execution"
-    },
-    {
-      "parameters": {
-        "jsCode": "const uuid = require('uuid');\n\n// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.body.id = uuid.v4();\n}\n\nreturn $input.all();"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        208,
-        224
-      ],
-      "id": "c5b96594-d42c-4e54-9d9d-c8819a76ee0a",
-      "name": "Codex Webhook UUID"
-    },
-    {
-      "parameters": {
-        "jsCode": "const uuid = require('uuid');\n\n// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.body.id = uuid.v4();\n}\n\nreturn $input.all();"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        208,
-        544
-      ],
-      "id": "77b58fe3-e331-47e6-ac8b-1d87b7788183",
-      "name": "MS Teams Channels UUID",
-      "disabled": true
-    },
-    {
-      "parameters": {
-        "aggregate": "aggregateAllItemData",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.aggregate",
-      "typeVersion": 1,
-      "position": [
-        656,
-        544
-      ],
-      "id": "a0955832-7fa6-4d4b-b7d5-23f8e62be758",
-      "name": "Aggregate",
+      "id": "cbd2c362-888a-4263-a392-d8ddbbe47445",
+      "name": "Socket.IO Pull Requests",
       "disabled": true
     },
     {
@@ -223,55 +225,186 @@
         "url": "http://localhost:3000/workflow/channels",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ $json.data }}",
+        "jsonBody": "={{ $json.value }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        880,
-        544
+        864,
+        704
       ],
-      "id": "ef9395eb-1964-4099-ae3d-891e44408d16",
+      "id": "c644954b-fd7e-47be-a5ea-b90334203f0c",
       "name": "Socket.IO Channels",
       "disabled": true
     },
     {
       "parameters": {
-        "httpMethod": "POST",
-        "path": "channels",
+        "command": "=codex exec \"{{ $json.body.prompt }}\" --json"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        640,
+        224
+      ],
+      "id": "fb39055a-b5b0-45c8-b792-6061c238522f",
+      "name": "Codex Prompt",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const uuid = require('uuid');\n\n// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.body.id = uuid.v4();\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        608
+      ],
+      "id": "c5b96594-d42c-4e54-9d9d-c8819a76ee0a",
+      "name": "Workflow UUID",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ad77dd8e-6236-4fd6-b0af-7dec0d9a8cb3",
+                    "leftValue": "={{ $json.body.resource }}",
+                    "rightValue": "codex",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.resource }}",
+                    "rightValue": "teams",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "142e21ef-04d5-4119-9d72-eca28364701a"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "01c133f7-b9dd-4fa2-903a-aeac7eb72368",
+                    "leftValue": "={{ $json.body.resource }}",
+                    "rightValue": "channels",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a07a36a3-4dc5-4f67-8333-6e17c8aad4bb",
+                    "leftValue": "={{ $json.body.resource }}",
+                    "rightValue": "pull-requests",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
         "options": {}
       },
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2.1,
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
       "position": [
-        -16,
-        544
+        416,
+        576
       ],
-      "id": "5637c5da-8082-4d54-a02a-83dc52a6e933",
-      "name": "Channels Webhook",
-      "webhookId": "e3c01382-5942-44f4-b7c0-f41d5819bf8b",
+      "id": "30815e7d-1b99-4902-b285-d1ed3c5d75fb",
+      "name": "Switch",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "command": "gh pr list --json number,title,commits,author"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        640,
+        896
+      ],
+      "id": "90dc2e7a-6862-4591-9119-8e5419ea519f",
+      "name": "Get Pull Requests",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return JSON.parse($input.first().json.stdout);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        864,
+        896
+      ],
+      "id": "b058ff95-c02a-4d14-ae32-d2b9b4234604",
+      "name": "JSON Parse Pull Requests",
       "disabled": true
     }
   ],
   "pinData": {},
   "connections": {
-    "Execute Codex Prompt": {
-      "main": [
-        [
-          {
-            "node": "Socket.IO Execution",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Mapping Data",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "MS Teams Send Message": {
       "main": [
         []
@@ -309,56 +442,23 @@
         ]
       ]
     },
-    "Codex Webhook": {
-      "main": [
-        [
-          {
-            "node": "Codex Webhook UUID",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get many channels": {
-      "main": [
-        [
-          {
-            "node": "Aggregate",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Socket.IO Execution": {
       "main": [
         []
       ]
     },
-    "Codex Webhook UUID": {
+    "Get Joined Teams": {
       "main": [
         [
           {
-            "node": "Execute Codex Prompt",
+            "node": "Socket.IO Joined Teams",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "MS Teams Channels UUID": {
-      "main": [
-        [
-          {
-            "node": "Get many channels",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Aggregate": {
+    "Get Channels": {
       "main": [
         [
           {
@@ -369,11 +469,92 @@
         ]
       ]
     },
-    "Channels Webhook": {
+    "Codex": {
       "main": [
         [
           {
-            "node": "MS Teams Channels UUID",
+            "node": "Workflow UUID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Codex Prompt": {
+      "main": [
+        [
+          {
+            "node": "Socket.IO Execution",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Mapping Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow UUID": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Codex Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Joined Teams",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Channels",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Pull Requests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Pull Requests": {
+      "main": [
+        [
+          {
+            "node": "JSON Parse Pull Requests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JSON Parse Pull Requests": {
+      "main": [
+        [
+          {
+            "node": "Socket.IO Pull Requests",
             "type": "main",
             "index": 0
           }
@@ -385,7 +566,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "84c7a592-e435-4b1e-9a7d-6d3249a4e262",
+  "versionId": "251d2d7e-5403-4135-8386-d14d426e3bfd",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "d0a98d1883d50ab1fb11f1c2089250d1d7492821be2ab8133be1cc4d824c5a45"
