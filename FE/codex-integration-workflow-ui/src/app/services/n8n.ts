@@ -8,11 +8,7 @@ import { APIS } from '../enums/apis';
 export class N8nAPI {
   readonly #http = inject(HttpClient);
 
-  triggerCodexWebhook(data: any) {
-    return this.#http.post(APIS.n8n.webhook.codex, data);
-  }
-
-  triggerChannelsWebhook() {
-    return this.#http.post(APIS.n8n.webhook.channels, {});
+  triggerWorkflow(data: any) {
+    return this.#http.post(APIS.n8n.webhook.codexIntegrationWorkflow, data);
   }
 }

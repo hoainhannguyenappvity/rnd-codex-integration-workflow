@@ -42,10 +42,26 @@ app.post('/workflow/execution', (req, res) => {
   res.status(201).json(req.body);
 });
 
+app.post('/workflow/teams', (req, res) => {
+  console.log('Teams ::', req.body);
+  io.emit('message', {
+    teams: req.body,
+  });
+  res.status(201).json(req.body);
+});
+
 app.post('/workflow/channels', (req, res) => {
   console.log('Channels ::', req.body);
   io.emit('message', {
     channels: req.body,
+  });
+  res.status(201).json(req.body);
+});
+
+app.post('/workflow/pull-requests', (req, res) => {
+  console.log('Pull Requests ::', req.body);
+  io.emit('message', {
+    pullRequests: req.body,
   });
   res.status(201).json(req.body);
 });
