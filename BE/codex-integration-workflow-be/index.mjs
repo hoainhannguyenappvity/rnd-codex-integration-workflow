@@ -58,6 +58,14 @@ app.post('/workflow/channels', (req, res) => {
   res.status(201).json(req.body);
 });
 
+app.post('/workflow/repository', (req, res) => {
+  console.log('Repository ::', req.body);
+  io.emit('message', {
+    repository: req.body,
+  });
+  res.status(201).json(req.body);
+});
+
 app.post('/workflow/pull-requests', (req, res) => {
   console.log('Pull Requests ::', req.body);
   io.emit('message', {

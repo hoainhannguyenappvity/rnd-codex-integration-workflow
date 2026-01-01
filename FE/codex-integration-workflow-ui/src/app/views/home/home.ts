@@ -69,10 +69,20 @@ export class Home {
     },
   ]);
 
+  // Repository
+  repository = signal<any>({
+    name: '',
+    owner: {
+      id: '',
+      login: '',
+    },
+  });
+
   // Pull Requests
+  selectedPullRequestNumber = '';
   pullRequests = signal<any[]>([
     {
-      id: '',
+      number: '',
       title: 'None',
     },
   ]);
@@ -91,7 +101,7 @@ export class Home {
       this.socket.on('message', (message) => {
         console.log('Socket.IO message ::', message);
 
-        const { execution, teams, channels, pullRequests, commits } = message;
+        const { execution, teams, channels, pullRequests, repository } = message;
 
         if (execution) {
           this.n8nExecutionStore.add({
@@ -122,10 +132,14 @@ export class Home {
           ]);
         }
 
+        if (repository) {
+          this.repository.set(repository);
+        }
+
         if (pullRequests) {
           this.pullRequests.set([
             {
-              id: '',
+              number: '',
               title: 'None',
             },
             ...pullRequests,
@@ -136,6 +150,20 @@ export class Home {
       this.#n8nAPI
         .triggerWorkflow({
           resource: 'teams',
+          data: null,
+        })
+        .subscribe();
+
+      this.#n8nAPI
+        .triggerWorkflow({
+          resource: 'repository',
+          data: null,
+        })
+        .subscribe();
+
+      this.#n8nAPI
+        .triggerWorkflow({
+          resource: 'pull-requests',
           data: null,
         })
         .subscribe();
@@ -203,6 +231,8 @@ export class Home {
   sendPrompt() {
     const data = {
       prompt: this.prompt,
+      pullRequest: this.pullRequests().find((pr) => pr.number === this.selectedPullRequestNumber) || null,
+      repository: this.repository(),
       recipients: {
         emails: this.emails(),
         teamId: this.selectedTeamId,

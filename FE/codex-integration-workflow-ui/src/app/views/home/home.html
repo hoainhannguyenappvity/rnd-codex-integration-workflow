@@ -16,6 +16,22 @@
       </section>
 
       <section class="flex flex-col gap-4 bg-gray-100 p-4">
+        <h2 class="text-2xl font-medium">Repository</h2>
+
+        <h4 class="text-xl font-medium">{{ repository().name }} ({{ repository().owner.login }})</h4>
+        <section class="flex flex-row gap-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Select a Pull Request</mat-label>
+            <mat-select [(ngModel)]="selectedPullRequestNumber" canSelectNullableOptions>
+              @for (pullRequest of pullRequests(); track pullRequest.number) {
+                <mat-option [value]="pullRequest.number">{{ pullRequest.title }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </section>
+      </section>
+
+      <section class="flex flex-col gap-4 bg-gray-100 p-4">
         <h2 class="text-2xl font-medium">Recipients</h2>
 
         <h4 class="text-xl font-medium">Emails</h4>
