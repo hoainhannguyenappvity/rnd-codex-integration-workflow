@@ -47,7 +47,7 @@ app.post('/workflow/teams', (req, res) => {
   io.emit('message', {
     teams: req.body,
   });
-  res.status(201).json(req.body);
+  res.status(200).json(req.body);
 });
 
 app.post('/workflow/channels', (req, res) => {
@@ -55,7 +55,7 @@ app.post('/workflow/channels', (req, res) => {
   io.emit('message', {
     channels: req.body,
   });
-  res.status(201).json(req.body);
+  res.status(200).json(req.body);
 });
 
 app.post('/workflow/repository', (req, res) => {
@@ -63,7 +63,7 @@ app.post('/workflow/repository', (req, res) => {
   io.emit('message', {
     repository: req.body,
   });
-  res.status(201).json(req.body);
+  res.status(200).json(req.body);
 });
 
 app.post('/workflow/pull-requests', (req, res) => {
@@ -71,7 +71,7 @@ app.post('/workflow/pull-requests', (req, res) => {
   io.emit('message', {
     pullRequests: req.body,
   });
-  res.status(201).json(req.body);
+  res.status(200).json(req.body);
 });
 
 server.listen(3000, () => {
