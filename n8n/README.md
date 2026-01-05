@@ -27,11 +27,3 @@ Run below command in **Windows PowerShell** or **Command Prompt**
 ```bash
 npm install -g @openai/codex
 ```
-
-## Newman (Postman)
-
-Run below command in **Windows PowerShell** or **Command Prompt**
-
-```bash
-npm i -g newman
-```
