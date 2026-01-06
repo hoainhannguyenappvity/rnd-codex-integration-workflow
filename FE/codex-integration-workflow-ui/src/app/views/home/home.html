@@ -62,7 +62,7 @@
 
         <h4 class="text-xl font-medium">MS Teams</h4>
         <section class="flex flex-row gap-4">
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" class="w-md">
             <mat-label>Select a Team</mat-label>
             <mat-select [(ngModel)]="selectedTeamId" canSelectNullableOptions (selectionChange)="onTeamChange($event)">
               @for (team of teams(); track team.id) {
@@ -71,7 +71,7 @@
             </mat-select>
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" class="w-md">
             <mat-label>Select a Channel</mat-label>
             <mat-select [(ngModel)]="selectedChannelId" canSelectNullableOptions>
               @for (channel of channels(); track channel.id) {
