@@ -8,7 +8,15 @@ Install **n8n** via npm
 npm i -g n8n
 ```
 
-### Startup
+### npm Startup
+
+Run below command in **Terminal**
+
+```bash
+npx dotenv -e .env -- n8n
+```
+
+### Windows Startup
 
 Run below command in **Command Prompt**
 
@@ -16,7 +24,13 @@ Run below command in **Command Prompt**
 set NODES_EXCLUDE="[]" && set N8N_COMMUNITY_PACKAGES_ENABLED=true && set NODE_FUNCTION_ALLOW_EXTERNAL=uuid && set N8N_RESTRICT_FILE_ACCESS_TO="./" && set N8N_SECURE_COOKIE=false && n8n
 ```
 
-### Linux Server Startup
+Run below command in **Windows PowerShell**
+
+```bash
+$env:NODES_EXCLUDE="[]" ; $env:N8N_COMMUNITY_PACKAGES_ENABLED="true" ; $env:NODE_FUNCTION_ALLOW_EXTERNAL="uuid" ; $env:N8N_RESTRICT_FILE_ACCESS_TO="./" ; $env:N8N_SECURE_COOKIE="false" ; n8n
+```
+
+### Linux Startup
 
 Ensure all environment variables are set in your system. Copy .env file to your system and set the variables accordingly.
 
@@ -29,6 +43,10 @@ pm2 install -g pm2
 Start n8n with pm2
 
 ```bash
+# Get n8n bin path
+which n8n
+# Example output: /home/username/.nvm/versions/node/v24.12.0/bin/n8n
+# Start n8n with pm2
 pm2 start $HOME/.nvm/versions/node/v24.12.0/bin/n8n
 ```
 
