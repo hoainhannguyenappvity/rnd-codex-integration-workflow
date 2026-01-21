@@ -50,6 +50,30 @@ which n8n
 pm2 start $HOME/.nvm/versions/node/v24.12.0/bin/n8n
 ```
 
+## Docker Startup
+
+Run n8n with Docker
+
+```bash
+docker volume create n8n_data
+
+docker run -it --rm \
+ --name n8n \
+ -p 5678:5678 \
+ -e GENERIC_TIMEZONE="Asia/Ho_Chi_Minh" \
+ -e TZ="Asia/Ho_Chi_Minh" \
+ -e "NODES_EXCLUDE=[]" \
+ -e N8N_COMMUNITY_PACKAGES_ENABLED=true \
+ -e NODE_FUNCTION_ALLOW_EXTERNAL=uuid \
+ -e N8N_RESTRICT_FILE_ACCESS_TO=./ \
+ -e N8N_SECURE_COOKIE=false \
+ -v n8n_data:/home/node/.n8n \
+ --network local \
+ n8nio/n8n
+```
+
+Verify n8n is running by accessing `http://localhost:5678` in your web browser.
+
 ### Import Workflow
 
 Import **Codex Integration Workflow.json** file to your n8n workflows
