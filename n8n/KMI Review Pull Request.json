@@ -1,0 +1,180 @@
+{
+  "name": "KMI Review Pull Request",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "review-pull-request",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "488698a2-d25e-45eb-9a9c-4d7188e6d0f8",
+      "name": "Webhook",
+      "webhookId": "a7f734b4-72f4-4b79-a885-b04c7274015d"
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.stdout }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        880,
+        0
+      ],
+      "id": "e8302afa-07db-406c-990d-a39a41cdc70f",
+      "name": "Markdown to HTML"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.microsoft.com/v1.0/me/sendMail",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": {\n    \"subject\": \"{{$('Webhook').item.json.body.emailSubject}} {{ $now.format('DD h:mm:ss a') }}\",\n    \"body\": {\n      \"contentType\": \"HTML\",\n      \"content\": {{ $('Markdown to HTML').item.json.data.toJsonString() }}\n    },\n    \"toRecipients\": [\n      {\n        \"emailAddress\": {\n          \"address\": \"phong.dang@appvity.com\"\n        }\n      },\n      {\n        \"emailAddress\": {\n          \"address\": \"loc.nguyen@appvity.com\"\n        }\n      },\n      {\n        \"emailAddress\": {\n          \"address\": \"duc.ho@appvity.com\"\n        }\n      },\n      {\n        \"emailAddress\": {\n          \"address\": \"nhan.nguyen@appvity.com\"\n        }\n      },\n      {\n        \"emailAddress\": {\n          \"address\": \"vinh.tran@appvity.com\"\n        }\n      },\n      {\n        \"emailAddress\": {\n          \"address\": \"anh.pham@appvity.com\"\n        }\n      },\n      {\n        \"emailAddress\": {\n          \"address\": \"ban.nguyen@appvity.com\"\n        }\n      }\n    ]\n  },\n  \"saveToSentItems\": \"false\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1104,
+        0
+      ],
+      "id": "f4d55675-0dde-4290-bbad-9e667d001d80",
+      "name": "Outlook Send Mail",
+      "credentials": {
+        "microsoftOAuth2Api": {
+          "id": "PEGRY1gNZ24cyqXA",
+          "name": "botuser@appvity.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=rm -rf ~/tmp/prompt_{{ $('Webhook').item.json.body.pullRequestNumber }}.md"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "2c058cad-c3ce-4802-9e78-5581c8d71fe0",
+      "name": "Clean up prompt.md",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "command": "=echo \"Act as a senior web developer and tech lead. Execute 'gh pr diff {{ $('Webhook').item.json.body.pullRequestNumber }}' to get the pull request changes, then perform a thorough code review covering:  1. Code quality and maintainability 2. Potential bugs and edge cases 3. Security vulnerabilities 4. Performance concerns 5. TypeScript/type safety issues 5. Error handling and validation 7. Adherence to framework best practices 8. Code consistency and style 9. Testing coverage gaps 10. Breaking changes or backward compatibility.  Organize feedback by priority (Critical/High/Medium/Low), provide specific code examples for improvements, and conclude with a clear merge recommendation (Approve/Approve with changes/Request changes/Reject) with reasoning. No conversational text, markdown only.\" > /home/node/tmp/prompt_{{ $('Webhook').item.json.body.pullRequestNumber }}.md"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        432,
+        0
+      ],
+      "id": "1e36ff3b-c662-4d2c-a18d-3beb802219e8",
+      "name": "Compile prompt.md"
+    },
+    {
+      "parameters": {
+        "command": "=PULL_REQUEST_NUMBER={{ $('Webhook').item.json.body.pullRequestNumber }} node codex.js"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        656,
+        0
+      ],
+      "id": "b0080d1d-c980-431e-b814-1d39e3a0bea2",
+      "name": "Run Codex"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Clean up prompt.md",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown to HTML": {
+      "main": [
+        [
+          {
+            "node": "Outlook Send Mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean up prompt.md": {
+      "main": [
+        [
+          {
+            "node": "Compile prompt.md",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compile prompt.md": {
+      "main": [
+        [
+          {
+            "node": "Run Codex",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Codex": {
+      "main": [
+        [
+          {
+            "node": "Markdown to HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "364e4d6f-3c54-480b-a2a0-227a9c059a63",
+  "meta": {
+    "instanceId": "b124d797f7486c0b9dbbac0be30edaeb55ef35fd5e1489ef30e52838f0308717"
+  },
+  "id": "MEcSzuibQElutQW7kwAd9",
+  "tags": []
+}
